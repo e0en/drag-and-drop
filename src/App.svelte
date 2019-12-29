@@ -1,24 +1,5 @@
 <script>
-  import DraggableItem from "./DraggableItem.svelte"
-
-  export let count
-
-  // a dummy data
-  const items = [...Array(count).keys()].map(function(i) {
-    return { itemId: i + 1, isSelected: false }
-  });
-
-  function handleSelect(ev) {
-    for (var i = 0; i < items.length; i++) {
-      items[i].isSelected = items[i].itemId == ev.detail.itemId
-    }
-  }
-
-  function handleMouseUp(ev) {
-    for (var i = 0; i < items.length; i++) {
-      items[i].isSelected = false
-    }
-  }
+import DraggableList from "./DraggableList.svelte"
 </script>
 
 <style>
@@ -34,14 +15,7 @@
   }
 </style>
 
-<main on:mouseup={handleMouseUp}>
+<main>
   <h1>Drag and drop test</h1>
-  <section>
-    {#each items as item}
-      <DraggableItem
-        itemId={item.itemId}
-        isSelected={item.isSelected}
-        on:selectItem={handleSelect} />
-    {/each}
-  </section>
+  <DraggableList count=5 />
 </main>
