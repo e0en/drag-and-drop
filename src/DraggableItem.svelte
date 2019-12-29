@@ -21,6 +21,7 @@
     border: 1px solid black;
     margin: 1em;
     padding: 1em;
+    user-select: none;
   }
 
   .selected {
