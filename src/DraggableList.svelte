@@ -6,6 +6,8 @@ export let count
 let items = []
 let selectedItemIdx = null
 let clickY = null
+let elem = null
+let dragElem = null
 
 onMount(async () => {
   items = [...Array(parseInt(count)).keys()].map(function(i) {
@@ -18,12 +20,16 @@ function handleMouseUp(ev) {
     items[i].isSelected = false
     items[i].yDrag = 0
   }
+  dragElem.remove()
+  dragElem = null
   selectedItemIdx = null
 }
 
 function handleMouseMove(ev) {
-  if (!(selectedItemIdx === null)) {
-    items[selectedItemIdx].yDrag = ev.clientY - clickY
+  if (selectedItemIdx !== null) {
+    const dY = ev.clientY - clickY
+    dragElem.style.transform = "translate(0, " + dY.toString(10) + "px)"
+    dragElem.style.background = "red"
   }
 }
 
@@ -32,9 +38,21 @@ function handleMouseDown (ev) {
   items[selectedItemIdx].isSelected = true
   clickY = ev.clientY
 
+  dragElem = this.cloneNode(true)
+  console.log(dragElem)
+
   const oldStyle = window.getComputedStyle(this)
-  this.style.width = oldStyle.getPropertyValue('width')
-  this.style.height = oldStyle.getPropertyValue('height')
+  const boundingRect = this.getBoundingClientRect()
+  dragElem.style.position = "fixed"
+  dragElem.style.margin = "0"
+  dragElem.style.top = boundingRect.top.toString() + "px"
+  dragElem.style.left = boundingRect.left.toString() + "px"
+  dragElem.style.width = oldStyle.getPropertyValue('width')
+  dragElem.style.height = oldStyle.getPropertyValue('height')
+  dragElem.style.transitionDuration = "0s"
+
+  const body = document.getElementsByTagName('body')[0]
+  body.appendChild(dragElem)
 }
 </script>
 
@@ -49,10 +67,6 @@ function handleMouseDown (ev) {
     background: white;
   }
   .selected {
-    position: fixed;
-    margin: 0;
-    transition-duration: 0s;
-    z-index: 9999;
     background: yellow;
   }
 </style>
@@ -60,9 +74,9 @@ function handleMouseDown (ev) {
 
 <svelte:window on:mouseup={handleMouseUp} on:mousemove={handleMouseMove} />
 
-<section>
+<section bind:this={elem}>
 {#each items as item}
-<div class:selected={item.isSelected} on:mousedown={handleMouseDown} style="transform: translate(0px, {item.yDrag}px);">
+<div class:selected={item.isSelected} on:mousedown={handleMouseDown}>
    Card {item.itemId}
   </div>
 {/each}
