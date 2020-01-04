@@ -16,13 +16,15 @@ onMount(async () => {
 })
 
 function handleMouseUp(ev) {
-  for (var i = 0; i < items.length; i++) {
-    items[i].isSelected = false
-    items[i].yDrag = 0
+  if (dragElem !== null) {
+    for (var i = 0; i < items.length; i++) {
+      items[i].isSelected = false
+      items[i].yDrag = 0
+    }
+    dragElem.remove()
+    dragElem = null
+    selectedItemIdx = null
   }
-  dragElem.remove()
-  dragElem = null
-  selectedItemIdx = null
 }
 
 function handleMouseMove(ev) {
@@ -30,6 +32,40 @@ function handleMouseMove(ev) {
     const dY = ev.clientY - clickY
     dragElem.style.transform = "translate(0, " + dY.toString(10) + "px)"
     dragElem.style.background = "red"
+
+    var boundingBoxes = Array()
+    for (const el of elem.children) {
+      const boundingRect = el.getBoundingClientRect()
+      const rect = {
+        xmin: boundingRect.left,
+        xmax: boundingRect.left + boundingRect.width,
+        ymin: boundingRect.top,
+        ymax: boundingRect.top + boundingRect.height,
+      }
+      boundingBoxes = [...boundingBoxes, rect]
+    }
+
+    var landingAfter = -1
+    for (const bb of boundingBoxes) {
+      if (ev.clientY > bb.ymin) {
+        landingAfter += 1
+      }
+    }
+    if (landingAfter == selectedItemIdx) {
+      return
+    }
+    const tmp = items[selectedItemIdx]
+    const n = items.length
+    var newItems = [...items.slice(0, selectedItemIdx), ...items.slice(selectedItemIdx + 1, n)]
+    if (landingAfter == -1) {
+      items = [tmp, ...newItems]
+      selectedItemIdx = 0
+      return
+    } else {
+      items = [...newItems.slice(0, landingAfter), tmp, ...newItems.slice(landingAfter, n - 1)]
+      selectedItemIdx = landingAfter
+      return
+    }
   }
 }
 
@@ -39,7 +75,6 @@ function handleMouseDown (ev) {
   clickY = ev.clientY
 
   dragElem = this.cloneNode(true)
-  console.log(dragElem)
 
   const oldStyle = window.getComputedStyle(this)
   const boundingRect = this.getBoundingClientRect()
