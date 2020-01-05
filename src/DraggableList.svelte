@@ -30,8 +30,7 @@ function copyComputedStyle(from, to) {
   }
   for (const property of computedStyle) {
     if (stylePropertyValid(property, computedStyle[property])) {
-      to.style[property] = computedStyle[property];
-
+      to.style[property] = computedStyle[property]
     }
   }
 }
@@ -50,9 +49,17 @@ function handleMouseUp(ev) {
 
 function handleMouseMove(ev) {
   if (selectedItemIdx !== null) {
-    const dY = ev.clientY - clickY
+    var clientY = clickY
+    if (ev.type == "mousemove") {
+      clientY = ev.clientY
+    } else if (ev.type == "touchmove") {
+      clientY = ev.touches[0].clientY
+    } else {
+      console.log(ev)
+    }
+
+    const dY = clientY - clickY
     dragElem.style.transform = "translate(0, " + dY.toString(10) + "px)"
-    dragElem.style.background = "red"
 
     var boundingBoxes = Array()
     for (const el of elem.children) {
@@ -93,7 +100,13 @@ function handleMouseMove(ev) {
 function handleMouseDown (ev) {
   selectedItemIdx = [...this.parentElement.children].indexOf(this)
   items[selectedItemIdx].isSelected = true
-  clickY = ev.clientY
+  if (ev.type == "mousedown") {
+    clickY = ev.clientY
+  } else if (ev.type == "touchstart") {
+    clickY = ev.touches[0].clientY
+  } else {
+    console.log(ev)
+  }
 
   dragElem = this.cloneNode(true)
   copyComputedStyle(this, dragElem)
@@ -124,16 +137,17 @@ function handleMouseDown (ev) {
     background: white;
   }
   .selected {
-    background: yellow;
+    opacity: 0.2;
   }
 </style>
 
 
-<svelte:window on:mouseup={handleMouseUp} on:mousemove={handleMouseMove} />
+<svelte:window on:mouseup={handleMouseUp} on:mousemove={handleMouseMove}
+               on:touchend={handleMouseUp} on:touchmove={handleMouseMove} />
 
 <section bind:this={elem}>
 {#each items as item}
-<div class:selected={item.isSelected} on:mousedown={handleMouseDown}>
+<div class:selected={item.isSelected} on:mousedown={handleMouseDown} on:touchstart={handleMouseDown}>
    Card {item.itemId}
   </div>
 {/each}
