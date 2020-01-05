@@ -15,6 +15,27 @@ onMount(async () => {
   })
 })
 
+// taken from https://stackoverflow.com/a/19824266
+function copyComputedStyle(from, to) {
+  const computedStyle = from.currentStyle || document.defaultView.getComputedStyle(from, null)
+
+  // check browser compatibility
+  if (!computedStyle) return null
+  function stylePropertyValid(name, value) {
+    return typeof value !== 'undefined' &&
+	   typeof value !== 'object' &&
+	   typeof value !== 'function' &&
+	   value.length > 0 &&
+	   value != parseInt(value)
+  }
+  for (const property of computedStyle) {
+    if (stylePropertyValid(property, computedStyle[property])) {
+      to.style[property] = computedStyle[property];
+
+    }
+  }
+}
+
 function handleMouseUp(ev) {
   if (dragElem !== null) {
     for (var i = 0; i < items.length; i++) {
@@ -75,6 +96,7 @@ function handleMouseDown (ev) {
   clickY = ev.clientY
 
   dragElem = this.cloneNode(true)
+  copyComputedStyle(this, dragElem)
 
   const oldStyle = window.getComputedStyle(this)
   const boundingRect = this.getBoundingClientRect()
