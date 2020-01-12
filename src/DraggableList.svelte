@@ -119,6 +119,7 @@ function handleMouseDown (ev) {
   dragElem.style.left = boundingRect.left.toString() + "px"
   dragElem.style.width = oldStyle.getPropertyValue('width')
   dragElem.style.height = oldStyle.getPropertyValue('height')
+  dragElem.style.boxShadow = "0px 4px 8px 0 rgba(0, 0, 0, 0.2)"
   dragElem.style.transitionDuration = "0s"
 
   const body = document.getElementsByTagName('body')[0]
