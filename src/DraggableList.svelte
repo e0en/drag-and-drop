@@ -58,6 +58,14 @@ function handleMouseMove(ev) {
       console.log(ev)
     }
 
+    if (clientY < 100 && window.scrollY > 0) {
+      const speed = clientY - 100
+      window.scroll(window.scrollX, window.scrollY + speed)
+    } else if (clientY > (window.innerHeight - 100)) {
+      const speed = clientY - window.innerHeight + 100
+      window.scroll(window.scrollX, window.scrollY + speed)
+    }
+
     const dY = clientY - clickY
     dragElem.style.transform = "translate(0, " + dY.toString(10) + "px)"
 

@@ -17,5 +17,5 @@ import DraggableList from "./DraggableList.svelte"
 
 <main>
   <h1>Drag and drop test</h1>
-  <DraggableList count=5 />
+  <DraggableList count=100 />
 </main>
